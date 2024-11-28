@@ -1,20 +1,34 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.PasswordConstant;
+import com.sky.constant.StatusConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,5 +84,42 @@ public class EmployeeController {
     public Result<String> logout() {
         return Result.success();
     }
+
+
+    /**
+     * 新增员工
+     * @param employeeDTO
+     * @return
+     */
+    @ApiOperation("新增员工")
+    @PostMapping
+    public Result save(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("新增员工：{}", employeeDTO);
+
+        employeeService.save(employeeDTO);
+        return Result.success();
+    }
+
+
+    @ApiOperation("员工分页查询")
+    @GetMapping
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("员工分页查询，参数为：{}", employeePageQueryDTO);
+
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    @ApiOperation("启用禁止")
+    @PostMapping("/status/{status}")
+    public Result<PageResult> enableOrDisable(@PathVariable Integer status, Long id) {
+        log.info("启用禁止员工账号，参数为：{}，{}", status, id);
+
+        employeeService.enableOrDisable(status, id);
+        return Result.success();
+    }
+
+
+
 
 }
