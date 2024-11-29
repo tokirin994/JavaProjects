@@ -31,6 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+
+
 
 /**
  * 员工管理
@@ -118,6 +122,24 @@ public class EmployeeController {
         employeeService.enableOrDisable(status, id);
         return Result.success();
     }
+
+
+    @ApiOperation("根据id查询员工信息")
+    @GetMapping("/{id}")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("按照id={}查询员工", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    @ApiOperation("更新员工信息")
+    @PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("更新员工信息");
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
+    
 
 
 

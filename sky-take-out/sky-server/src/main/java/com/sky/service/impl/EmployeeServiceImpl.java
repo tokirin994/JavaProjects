@@ -73,12 +73,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        
+        // 已经使用公共字段代替
+        // employee.setCreateTime(LocalDateTime.now());
+        // employee.setUpdateTime(LocalDateTime.now());
 
-        // 获取线程内的用户id（换句话说一个请求的的controller service dao是同一个线程）
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // // 获取线程内的用户id（换句话说一个请求的的controller service dao是同一个线程）
+        // employee.setCreateUser(BaseContext.getCurrentId());
+        // employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
     }
@@ -100,6 +102,25 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .status(status)
                 .id(id)
                 .build();
+
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");
+        return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 已经使用公共字段代替
+        // employee.setUpdateTime(LocalDateTime.now());
+        // employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }
