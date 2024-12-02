@@ -20,4 +20,6 @@ public interface DishService {
      * @return
      */
     public PageResult page(DishPageQueryDTO dishPageQueryDTO);
+
+    public void update(DishDTO dishDTO);
 }

@@ -52,10 +52,6 @@ public class DishServiceImpl implements DishService{
 
             dishFlavorMapper.insertBatch(flavors);
         }
-
-        
-
-        
     }
 
 
@@ -74,6 +70,17 @@ public class DishServiceImpl implements DishService{
         List<DishVO> record = p.getResult();
         
         return new PageResult(total, record);
+    }
+
+
+    
+    /**
+     * 修改菜品
+     */
+    @Override
+    public void update(DishDTO dishDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
 
