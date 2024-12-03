@@ -37,5 +37,21 @@ sky:
     admin-ttl: 72000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+<<<<<<< HEAD
   
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  
+=======
+  alioss:
+    endpoint:  ${sky.alioss.endpoint}
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
+>>>>>>> d24ac78 (Function: delete dish and its flavor)
+=======
+  
+>>>>>>> 9e19c5b195ef3aedf2aaeaa410e708856271ce8a
+>>>>>>> f6c3b47d4511f6b31c6e4627bb4bb0fc0d4875a6
 
