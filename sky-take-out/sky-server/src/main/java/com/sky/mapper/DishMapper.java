@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -30,6 +32,13 @@ public interface DishMapper {
     void insert(Dish dish);
 
     Page<DishVO> page(DishPageQueryDTO dishPageQueryDTO);
+
+    @Select("select * from dish where id = #{id}")
+    Dish getById(Long id);
+
+    void deleteById(Long id);
+
+    void deleteByIds(List<Long> ids);
 
 
     

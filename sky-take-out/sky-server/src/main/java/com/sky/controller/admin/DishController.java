@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sky.dto.DishDTO;
@@ -12,10 +13,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +34,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class DishController {
 
     @Autowired
-    DishService dishServiceImpl;
+    DishService dishService;
 
     @ApiOperation("新增菜品")
     @PostMapping
     public Result<Object> postMethodName(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品:{}", dishDTO);
 
-        dishServiceImpl.saveWithFlavor(dishDTO);
+        dishService.saveWithFlavor(dishDTO);
         
         return Result.success();
     }
@@ -48,9 +51,29 @@ public class DishController {
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
         log.info("菜品分页查询:{}", dishPageQueryDTO);
 
-        PageResult dishes = dishServiceImpl.page(dishPageQueryDTO);
+        PageResult dishes = dishService.page(dishPageQueryDTO);
 
         return Result.success(dishes);
+    }
+
+
+    /**
+     * 菜品批量删除
+     *
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("菜品批量删除")
+    public Result delete(@RequestParam List<Long> ids) {
+        log.info("菜品批量删除：{}", ids);
+        dishService.deleteBatch(ids);
+
+        // TODO 
+        // 将所有的菜品缓存数据清理掉，所有以dish_开头的key
+        // cleanCache("dish_*");
+
+        return Result.success();
     }
 
 
@@ -59,7 +82,7 @@ public class DishController {
     public Result<Object> update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
 
-        dishServiceImpl.update(dishDTO);
+        dishService.update(dishDTO);
         return Result.success();
     }
     
