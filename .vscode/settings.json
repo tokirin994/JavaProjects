@@ -14,5 +14,6 @@
             "database": "mybatis",
             "name": "takeout"
         }
-    ]
+    ],
+    "maven.view": "hierarchical"
 }
