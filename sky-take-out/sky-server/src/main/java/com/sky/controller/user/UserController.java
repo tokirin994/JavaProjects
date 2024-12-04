@@ -9,13 +9,12 @@ import com.sky.entity.User;
 import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
 import com.sky.service.UserSercive;
-import com.sky.utils.HttpClientUtil;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.UserLoginVO;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.http.HttpClient;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/user/user")
 @Slf4j
+@Api(tags = "C端-用户接口")
 public class UserController {
 
     private static final String URL = "https://api.weixin.qq.com/sns/jscode2session";
