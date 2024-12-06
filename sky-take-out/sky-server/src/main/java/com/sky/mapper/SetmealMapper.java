@@ -97,7 +97,6 @@ public interface SetmealMapper {
      * @param id
      * @return
      */
-    // TODO xml文件resulmap有问题
     SetmealVO getByIdWithDish(Long id);
 
 

@@ -2,11 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealMapper">
+        <resultMap id="setmealAndDishMap" type="com.sky.vo.SetmealVO" autoMapping="true">
+                <result column="id" property="id"/>
+                <collection property="setmealDishes" ofType="SetmealDish">
+                <result column="sd_id" property="id"/>
+                <result column="setmeal_id" property="setmealId"/>
+                <result column="dish_id" property="dishId"/>
+                <result column="sd_name" property="name"/>
+                <result column="sd_price" property="price"/>
+                <result column="copies" property="copies"/>
+                </collection>
+        </resultMap>
 
 
         <!-- insert --> 
         <insert id="insert" useGeneratedKeys="true" keyProperty="id"> 
-                insert into dish (name, category_id, price, image, description, create_time, 
+                insert into setmeal (name, category_id, price, image, description, create_time, 
                 update_time, create_user, update_user, status) 
                 values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{createTime}, 
                 #{updateTime}, #{createUser}, #{updateUser}, #{status}) 
@@ -58,11 +69,11 @@
         </select>
 
         <!-- getByIdWithDish --> 
-        <!-- <select id="getByIdWithDish" parameterType="long" resultMap="setmealAndDishMap"> 
+        <select id="getByIdWithDish" parameterType="long" resultMap="setmealAndDishMap"> 
                 select a.*, b.id sd_id, b.setmeal_id, b.dish_id, b.name sd_name, 
                 b.price sd_price, b.copies 
                 from setmeal a left join setmeal_dish b 
                 on a.id = b.setmeal_id where a.id = #{id} 
-        </select> -->
+        </select>
 
 </mapper>
