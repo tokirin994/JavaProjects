@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.PutMapping;
  * 员工管理
  */
 @RestController
-// @RequestMapping("/admin/employee")
+@RequestMapping("/admin/employee")
 @Slf4j
 public class EmployeeController {
 
@@ -55,8 +55,7 @@ public class EmployeeController {
      * @param employeeLoginDTO
      * @return
      */
-    @RequestMapping("/employee")
-    // @PostMapping("/login")
+    @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
