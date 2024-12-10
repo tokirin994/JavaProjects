@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserSercive{
     private WeChatProperties weChatProperties;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     /**
      * 使用用户的许可码登录微信服务
