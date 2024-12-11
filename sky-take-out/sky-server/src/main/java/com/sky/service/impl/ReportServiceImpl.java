@@ -20,12 +20,12 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.service.WorkspaceService;
 import com.sky.vo.BusinessDataVO;
 import com.sky.vo.OrderReportVO;
 import com.sky.vo.SalesTop10ReportVO;
@@ -43,6 +43,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 统计营业额
@@ -85,7 +88,6 @@ public class ReportServiceImpl implements ReportService {
                 .turnoverList(StringUtils.join(turnList, ","))
                 .build();
     }
-
 
     /**
      * 用户统计
@@ -130,32 +132,32 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
-
     /**
      * 根据条件统计订单数量
+     * 
      * @param begin
      * @param end
      * @param status
      * @return
      */
-    private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status){
+    private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status) {
         Map map = new HashMap();
-        map.put("begin",begin);
-        map.put("end",end);
-        map.put("status",status);
+        map.put("begin", begin);
+        map.put("end", end);
+        map.put("status", status);
 
         return orderMapper.countByMap(map);
     }
 
-
     /**
      * 统计指定时间区间内的订单数据
+     * 
      * @param begin
      * @param end
      * @return
      */
     public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
-        //存放从begin到end之间的每天对应的日期
+        // 存放从begin到end之间的每天对应的日期
         List<LocalDate> dateList = new ArrayList<>();
 
         dateList.add(begin);
@@ -165,50 +167,52 @@ public class ReportServiceImpl implements ReportService {
             dateList.add(begin);
         }
 
-        //存放每天的订单总数
+        // 存放每天的订单总数
         List<Integer> orderCountList = new ArrayList<>();
-        //存放每天的有效订单数
+        // 存放每天的有效订单数
         List<Integer> validOrderCountList = new ArrayList<>();
 
-        //遍历dateList集合，查询每天的有效订单数和订单总数
+        // 遍历dateList集合，查询每天的有效订单数和订单总数
         for (LocalDate date : dateList) {
-            //查询每天的订单总数 select count(id) from orders where order_time > ? and order_time < ?
+            // 查询每天的订单总数 select count(id) from orders where order_time > ? and order_time <
+            // ?
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
             Integer orderCount = getOrderCount(beginTime, endTime, null);
 
-            //查询每天的有效订单数 select count(id) from orders where order_time > ? and order_time < ? and status = 5
+            // 查询每天的有效订单数 select count(id) from orders where order_time > ? and order_time <
+            // ? and status = 5
             Integer validOrderCount = getOrderCount(beginTime, endTime, Orders.COMPLETED);
 
             orderCountList.add(orderCount);
             validOrderCountList.add(validOrderCount);
         }
 
-        //计算时间区间内的订单总数量
+        // 计算时间区间内的订单总数量
         Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
 
-        //计算时间区间内的有效订单数量
+        // 计算时间区间内的有效订单数量
         Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
 
         Double orderCompletionRate = 0.0;
-        if(totalOrderCount != 0){
-            //计算订单完成率
+        if (totalOrderCount != 0) {
+            // 计算订单完成率
             orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
         }
 
-        return  OrderReportVO.builder()
-                .dateList(StringUtils.join(dateList,","))
-                .orderCountList(StringUtils.join(orderCountList,","))
-                .validOrderCountList(StringUtils.join(validOrderCountList,","))
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .orderCountList(StringUtils.join(orderCountList, ","))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ","))
                 .totalOrderCount(totalOrderCount)
                 .validOrderCount(validOrderCount)
                 .orderCompletionRate(orderCompletionRate)
                 .build();
     }
 
-
     /**
      * 统计指定时间区间内的销量排名前10
+     * 
      * @param begin
      * @param end
      * @return
@@ -224,12 +228,79 @@ public class ReportServiceImpl implements ReportService {
         List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
         String numberList = StringUtils.join(numbers, ",");
 
-        //封装返回结果数据
+        // 封装返回结果数据
         return SalesTop10ReportVO
                 .builder()
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+    /**
+     * 导出运营数据报表
+     * 
+     * @param response
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        // 1. 获取数据与报表模板
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+        BusinessDataVO businessDataVO = workspaceService.getBusinessData(LocalDateTime.of(dateBegin, LocalTime.MIN),
+                LocalDateTime.of(dateEnd, LocalTime.MAX));
+
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/OperationalDataReportingTemplate.xlsx");
+
+        // 2. 填写报表数据
+        try {
+            XSSFWorkbook excel = new XSSFWorkbook(in);
+
+            XSSFSheet sheet = excel.getSheet("Sheet1");
+            // 填充时间单元格
+            sheet.getRow(1).getCell(1).setCellValue("时间："+dateBegin + "至" + dateEnd);
+
+            //获得第4行
+            XSSFRow row = sheet.getRow(3);
+            row.getCell(2).setCellValue(businessDataVO.getTurnover());
+            row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+
+            //获得第5行
+            row = sheet.getRow(4);
+            row.getCell(2).setCellValue(businessDataVO.getValidOrderCount());
+            row.getCell(4).setCellValue(businessDataVO.getUnitPrice());
+
+            //填充明细数据
+            for (int i = 0; i < 30; i++) {
+                LocalDate date = dateBegin.plusDays(i);
+                //查询某一天的营业数据
+                BusinessDataVO businessData = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+
+                //获得某一行
+                row = sheet.getRow(7 + i);
+                row.getCell(1).setCellValue(date.toString());
+                row.getCell(2).setCellValue(businessData.getTurnover());
+                row.getCell(3).setCellValue(businessData.getValidOrderCount());
+                row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(businessData.getUnitPrice());
+                row.getCell(6).setCellValue(businessData.getNewUsers());
+            }
+
+
+
+            // 3. 通过输出流将excel下载到客户端浏览器
+            ServletOutputStream outputStream = response.getOutputStream();
+            excel.write(outputStream);
+
+            excel.close();
+            outputStream.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+
     }
 
 }

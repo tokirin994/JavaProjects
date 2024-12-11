@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,6 +99,19 @@ public class ReportController {
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
         log.info("销量排名top10：{},{}",begin,end);
         return Result.success(reportService.getSalesTop10(begin,end));
+    }
+
+
+    /**
+     * 导出运营数据报表
+     * @param httpServletResponse
+     */
+    @GetMapping("/export")
+    public void exportBusinessData(HttpServletResponse response){
+        log.info("导出运营数据报表");
+
+        reportService.exportBusinessData(response);
+
     }
 
 }
