@@ -69,6 +69,8 @@
         order by order_time desc
     </select>
 
+
+    <!-- 根据动态条件统计营业额 -->
     <select id="sumByMap" resultType="java.lang.Double">
         select sum(amount) from orders
         <where>

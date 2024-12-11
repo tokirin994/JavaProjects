@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -51,5 +52,13 @@ public interface OrderMapper {
      */
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+
+
+    /**
+     * 根据动态条件统计营业额
+     * @param map
+     * @return
+     */
+    Double sumByMap(Map<String,Object> map);
 
 }
