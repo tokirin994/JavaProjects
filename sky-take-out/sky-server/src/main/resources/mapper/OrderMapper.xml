@@ -85,6 +85,8 @@
             </if>
         </where>
     </select>
+
+    <!-- 根据动态条件统计用户数目 -->
     <select id="countByMap" resultType="java.lang.Integer">
         select count(id) from orders
         <where>
@@ -99,6 +101,18 @@
             </if>
         </where>
     </select>
+
+    <!-- 根据动态条件统计订单 -->
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from orders
+            <where>
+            <if test="begin != null"> and order_time &gt; #{begin} </if>
+            <if test="end != null"> and order_time &lt; #{end} </if>
+            <if test="status != null"> and status = #{status} </if>
+            </where>
+    </select>
+
+    <!-- 根据动态条件统计前十的销量 -->
     <select id="getSalesTop10" resultType="com.sky.dto.GoodsSalesDTO">
         select od.name, sum(od.number) number
         from order_detail od,orders o

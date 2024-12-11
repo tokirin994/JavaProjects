@@ -88,7 +88,6 @@ public interface DishMapper {
     List<Dish> getBySetmealId(Long setmealId);
 
 
-    // TODO 暂时不知道用处
     /**
      * 根据条件统计菜品数量
      * @param map
